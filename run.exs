@@ -1,4 +1,4 @@
-signing_salt = :crypto.strong_rand_bytes(32) |> Base.encode16()
+signing_salt = :crypto.strong_rand_bytes(8) |> Base.encode16()
 secret_base = :crypto.strong_rand_bytes(32) |> Base.encode16()
 
 host =
@@ -28,11 +28,6 @@ Mix.install([
   {:phoenix, "~> 1.6.10"},
   {:phoenix_live_view, "~> 0.17.10"}
 ])
-
-# Dry run for copying cached mix install from builder to runner
-if System.get_env("EXS_DRY_RUN") == "true" do
-  System.halt(0)
-end
 
 defmodule SamplePhoenix.ErrorView do
   use Phoenix.View, root: ""
@@ -100,5 +95,11 @@ defmodule SamplePhoenix.Endpoint do
   plug Router
 end
 
-{:ok, _} = Supervisor.start_link([SamplePhoenix.Endpoint], strategy: :one_for_one)
-Process.sleep(:infinity)
+
+# Dry run for copying cached mix install from builder to runner
+if System.get_env("EXS_DRY_RUN") == "true" do
+  System.halt(0)
+else
+  {:ok, _} = Supervisor.start_link([SamplePhoenix.Endpoint], strategy: :one_for_one)
+  Process.sleep(:infinity)
+end
