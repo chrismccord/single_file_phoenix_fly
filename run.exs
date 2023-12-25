@@ -11,11 +11,11 @@ host =
 Application.put_env(:phoenix, :json_library, Jason)
 
 Application.put_env(:sample, SamplePhoenix.Endpoint,
+  adapter: Bandit.PhoenixAdapter,
   url: [host: host],
   http: [
-    ip: {0, 0, 0, 0, 0, 0, 0, 0},
+    ip: :any,
     port: String.to_integer(System.get_env("PORT") || "4000"),
-    transport_options: [socket_opts: [:inet6]]
   ],
   server: true,
   live_view: [signing_salt: signing_salt],
@@ -23,20 +23,20 @@ Application.put_env(:sample, SamplePhoenix.Endpoint,
 )
 
 Mix.install([
-  {:plug_cowboy, "~> 2.5"},
-  {:jason, "~> 1.0"},
-  {:phoenix, "~> 1.6.10"},
-  {:phoenix_live_view, "~> 0.17.10"}
+  {:bandit, "~> 1.1"},
+  {:jason, "~> 1.2"},
+  {:phoenix, "~> 1.7.10"},
+  {:phoenix_live_view, "~> 0.20.2"}
 ])
 
 defmodule SamplePhoenix.ErrorView do
-  use Phoenix.View, root: ""
+  use Phoenix.Component
 
   def render(_, _), do: "error"
 end
 
 defmodule SamplePhoenix.SampleLive do
-  use Phoenix.LiveView, layout: {__MODULE__, "live.html"}
+  use Phoenix.LiveView, layout: {__MODULE__, :live}
 
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :count, 0)}
@@ -44,8 +44,8 @@ defmodule SamplePhoenix.SampleLive do
 
   def render("live.html", assigns) do
     ~H"""
-    <script src="https://cdn.jsdelivr.net/npm/phoenix@1.6.10/priv/static/phoenix.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/phoenix_live_view@0.17.10/priv/static/phoenix_live_view.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phoenix@1.7.10/priv/static/phoenix.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phoenix_live_view@0.20.2/priv/static/phoenix_live_view.min.js"></script>
     <script>
       let liveSocket = new window.LiveView.LiveSocket("/live", window.Phoenix.Socket)
       liveSocket.connect()
